@@ -1,0 +1,325 @@
+<div layout="row" layout-align="center center" class="bom-table">
+    <div class="form-wrapper margin-15 md-whiteframe-5dp" flex-lg="100" flex-sm="100">
+
+        <!-- CONTENT -->
+        <div class="content">
+            <div layout="row" layout-align="space-between center" flex>
+                <span></span>
+
+                <md-button class="md-primary md-raised" ng-click="vm.showTabDialog($event, '', vm.products.objectId)" ng-disabled="vm.readonly;vm.SaveDisabled">
+                    Add Part to Bill Of Material
+                </md-button>
+            </div>
+            <div class="simple" ms-responsive-table>
+                <div layout="row" layout-align="space-between center" flex class="bdr-bottom">
+                    <div class="secondary-text nested-row" flex="10">
+                        <div class="table-header">
+                            <span class="column-title"></span>
+                        </div>
+                    </div>
+                    <div class="secondary-text nested-row" flex="10">
+                        <div class="table-header">
+                            <span class="column-title">S.No.</span>
+                        </div>
+                    </div>
+                    <div class="secondary-text nested-row" flex="10">
+                        <div class="table-header">
+                            <span class="column-title">Part Number</span>
+                        </div>
+                    </div>
+                    <div class="secondary-text nested-row" flex="10">
+                        <div class="table-header">
+                            <span class="column-title">Revision</span>
+                        </div>
+                    </div>
+                    <div class= "secondary-text nested-row" flex="10">
+                        <div class="table-header">
+                            <span class="column-title">Part Name</span>
+                        </div>
+                    </div>
+                    <div class="secondary-text nested-row" flex="10">
+                        <div class="table-header">
+                            <span class="column-title">Category</span>
+                        </div>
+                    </div>
+                    <div class="secondary-text nested-row" flex="10">
+                        <div class="table-header">
+                            <span class="column-title">Status</span>
+                        </div>
+                    </div>
+                    <div class="secondary-text nested-row" flex="10">
+                        <div class="table-header">
+                            <span class="column-title">Quantity</span>
+                        </div>
+                    </div>
+                    <div class="secondary-text nested-row" flex="10">
+                        <div class="table-header">
+                            <span class="column-title">Manufacturer  Name</span>
+                        </div>
+                    </div>
+                    <div class="secondary-text nested-row" flex="10">
+                        <div class="table-header">
+                            <span class="column-title">Manufacturer Part  Number</span>
+                        </div>
+                    </div>
+                    <div class="secondary-text nested-row" flex="10">
+                        <div class="table-header">
+                            <span class="column-title">Supplier Name</span>
+                        </div>
+                    </div>
+                    <div class="secondary-text nested-row" flex="10">
+                        <div class="table-header">
+                            <span class="column-title">Supplier Part Number</span>
+                        </div>
+                    </div>
+                </div>
+                <div layout="row" layout-align="space-between center" flex class="bdr-bottom" ng-hide="vm.boms.length > 0">
+                    <p layout-align="center">No Data Available</p>
+                </div>
+                <div ng-repeat="boms in vm.boms">
+                    <div layout="row" layout-align="space-between center" flex class="bdr-bottom"
+                         ng-click="boms.show = boms.show == true ? false : true">
+                        <div class="secondary-text nested-row-inner" flex="10">
+                            <md-button class="edit-button md-icon-button" ng-click="vm.showTabDialog($event, boms)"
+                                       aria-label="Organization details" ng-disabled="vm.readonly;vm.SaveDisabled">
+                                <md-icon md-font-icon="icon-pencil" class="s16"></md-icon>
+                            </md-button>
+                        </div>
+                        <div class="secondary-text nested-row-inner" flex="10">
+                            <span class="icon-size" ng-if="boms.fuseObjectBOMResponseList.length > 0">
+                                <span class="icon icon-chevron-right" ng-hide="boms.show == true"></span>
+                                <span class="icon icon-chevron-down" ng-show="boms.show == true"></span>
+                            </span>
+                            {{ $index + 1}}
+                        </div>
+                        <div class="secondary-text nested-row-inner" flex="10">
+                            <a ui-sref="app.objects.products.details({id:boms.objectId})" ng-if="boms.objectType == 'products'">{{ boms.objectNumber }}</a>
+                            <a ui-sref="app.objects.part.parts({id:boms.objectId})" ng-if="boms.objectType == 'parts'">{{ boms.objectNumber }}</a>
+                        </div>
+                        <div class="secondary-text nested-row-inner" flex="10">
+                            {{boms.revision}}
+                        </div>
+                        <div class="secondary-text nested-row-inner" flex="10">
+                            {{ boms.objectName }}
+                        </div>
+                        <div class="secondary-text nested-row-inner" flex="10">
+                            {{ boms.categoryName }}
+                        </div>
+
+                        <div class="secondary-text nested-row-inner" flex="10">
+                            {{ boms.status }}
+                        </div>
+                        <div class="secondary-text nested-row-inner" flex="10">
+                            {{ boms.quantity }}
+                        </div>
+                        <div class="secondary-text nested-row-inner" flex="40">
+                            <table ng-if="vm.hasSourcingRecord(boms.sourcingList);" ng-init="sourceList=vm.buildSourcingList(boms.sourcingList)" style="width: 100%" class="inner-table">
+                                <tr ng-repeat="source in ::sourceList | orderBy:['group'] | orderBy:['manufacturerName','name']:false">
+                                    <td>{{source.manufacturerName }}</td>
+                                    <td>{{source.manufacturerPartNumber }}</td>
+                                    <td>{{source.name }}</td>
+                                    <td>{{source.sourcingPartNumber }}</td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                    <div ng-if="boms.fuseObjectBOMResponseList.length > 0" ng-show="boms.show == true">
+                        <div ng-repeat="bomsSecond in boms.fuseObjectBOMResponseList">
+                            <div layout="row"  flex class="bdr-bottom"
+                                 ng-click="bomsSecond.show = bomsSecond.show == true ? false : true">
+                                <div class="secondary-text nested-row-inner" flex="10">
+                                    <md-button class="edit-button md-icon-button" ng-click="vm.showTabDialog($event, bomsSecond)"
+                                               aria-label="Organization details" ng-disabled="vm.readonly;vm.SaveDisabled">
+                                        <md-icon md-font-icon="icon-pencil" class="s16"></md-icon>
+                                    </md-button>
+                                </div>
+                                <div class="secondary-text nested-row-inner" flex="10">
+                                    <span class="icon-size" ng-if="bomsSecond.fuseObjectBOMResponseList.length > 0">
+                                        <span class="icon icon-chevron-right" ng-hide="bomsSecond.show == true"></span>
+                                        <span class="icon icon-chevron-down" ng-show="bomsSecond.show == true"></span>
+                                    </span>
+                                    {{ $index + 1}}
+                                </div>
+                                <div class="secondary-text nested-row-inner" flex="10">
+                                    <a ui-sref="app.objects.products.details({id:bomsSecond.objectId})" ng-if="bomsSecond.objectType == 'products'">{{ bomsSecond.objectNumber }}</a>
+                                    <a ui-sref="app.objects.part.parts({id:bomsSecond.objectId})" ng-if="bomsSecond.objectType == 'parts'">{{ bomsSecond.objectNumber }}</a>
+                                </div>
+                                <div class="secondary-text nested-row-inner" flex="10">
+                                    {{bomsSecond.revision}}
+                                </div>
+                                <div class="secondary-text nested-row-inner" flex="10">
+                                    {{ bomsSecond.objectName }}
+                                </div>
+                                <div class="secondary-text nested-row-inner" flex="10">
+                                    {{ bomsSecond.categoryName }}
+                                </div>
+                                <div class="secondary-text nested-row-inner" flex="10">
+                                    {{ bomsSecond.status }}
+                                </div>
+                                <div class="secondary-text nested-row-inner" flex="10">
+                                    {{ bomsSecond.quantity }}
+                                </div>
+                                <div class="secondary-text nested-row-inner" flex="40">
+                                    <table ng-if="vm.hasSourcingRecord(bomsSecond.sourcingList);" ng-init="secondSourceList=vm.buildSourcingList(bomsSecond.sourcingList)" style="width: 100%" class="inner-table">
+                                        <tr ng-repeat="source in ::secondSourceList | orderBy:['group'] | orderBy:['manufacturerName','name']:false">
+                                            <td>{{source.manufacturerName }}</td>
+                                            <td>{{source.manufacturerPartNumber }}</td>
+                                            <td>{{source.name }}</td>
+                                            <td>{{source.sourcingPartNumber }}</td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+                            <div ng-if="bomsSecond.fuseObjectBOMResponseList.length > 0" ng-show="bomsSecond.show == true">
+                                <div ng-repeat="bomsThird in bomsSecond.fuseObjectBOMResponseList">
+                                    <div layout="row" layout-align="space-between center" flex class="bdr-bottom">
+                                        <div class="secondary-text nested-row-inner" flex="10">
+                                            <md-button class="edit-button md-icon-button" ng-click="vm.showTabDialog($event, bomsThird)"
+                                                       aria-label="Organization details" ng-disabled="vm.readonly;vm.SaveDisabled">
+                                                <md-icon md-font-icon="icon-pencil" class="s16"></md-icon>
+                                            </md-button>
+                                        </div>
+                                        <div class="secondary-text nested-row-inner" flex="10">
+                                            <span class="icon-size" ng-if="bomsThird.fuseObjectBOMResponseList.length > 0">
+                                                <span class="icon icon-chevron-right" ng-hide="bomsThird.show == true"></span>
+                                                <span class="icon icon-chevron-down" ng-show="bomsThird.show == true"></span>
+                                            </span>
+                                            {{ $index + 1}}
+                                        </div>
+                                        <div class="secondary-text nested-row-inner" flex="10">
+                                            <a ui-sref="app.objects.products.details({id:bomThird.objectId})" ng-if="bomThird.objectType == 'products'">{{ bomThird.objectNumber }}</a>
+                                            <a ui-sref="app.objects.part.parts({id:bomThird.objectId})" ng-if="bomThird.objectType == 'parts'">{{ bomThird.objectNumber }}</a>
+                                        </div>
+                                        <div class="secondary-text nested-row-inner" flex="10">
+                                            {{bomsThird.revision}}
+                                        </div>
+                                        <div class="secondary-text nested-row-inner" flex="10">
+                                            {{ bomsThird.objectName }}
+                                        </div>
+                                        <div class="secondary-text nested-row-inner" flex="10">
+                                            {{ bomsThird.categoryName }}
+                                        </div>
+                                        <div class="secondary-text nested-row-inner" flex="10">
+                                            {{ bomsThird.status }}
+                                        </div>
+                                        <div class="secondary-text nested-row-inner" flex="10">
+                                            {{ bomsThird.quantity }}
+                                        </div>
+                                        <div class="secondary-text nested-row-inner" flex="40">
+                                            <table ng-if="vm.hasSourcingRecord(bomsThird.sourcingList);" ng-init="thirdSourceList = vm.buildSourcingList(bomsThird.sourcingList)" style="width: 100%" class="inner-table">
+                                                <tr ng-repeat="source in ::thirdSourceList  | orderBy:['group'] | orderBy:['manufacturerName','name']:false">
+                                                    <td>{{source.manufacturerName }}</td>
+                                                    <td>{{source.manufacturerPartNumber }}</td>
+                                                    <td>{{source.name }}</td>
+                                                    <td>{{source.sourcingPartNumber }}</td>
+                                                </tr>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div ng-repeat="bomForth in bomThird.fuseObjectBOMResponseList">
+                                    <div layout="row" layout-align="space-between center" flex class="bdr-bottom">
+                                        <div class="secondary-text nested-row-inner" flex="10">
+                                            <md-button class="edit-button md-icon-button" ng-click="vm.showTabDialog($event, bomForth)"
+                                                       aria-label="Organization details" ng-disabled="vm.readonly;vm.SaveDisabled">
+                                                <md-icon md-font-icon="icon-pencil" class="s16"></md-icon>
+                                            </md-button>
+                                        </div>
+                                        <div class="secondary-text nested-row-inner" flex="10">
+                                            <span class="icon-size" ng-if="bomForth.fuseObjectBOMResponseList.length > 0">
+                                                <span class="icon icon-chevron-right" ng-hide="bomForth.show == true"></span>
+                                                <span class="icon icon-chevron-down" ng-show="bomForth.show == true"></span>
+                                            </span>
+                                            {{ $index + 1}}
+                                        </div>
+                                        <div class="secondary-text nested-row-inner" flex="10">
+                                            <a ui-sref="app.objects.products.details({id:bomForth.objectId})" ng-if="bomForth.objectType == 'products'">{{ bomForth.objectNumber }}</a>
+                                            <a ui-sref="app.objects.part.parts({id:bomForth.objectId})" ng-if="bomForth.objectType == 'parts'">{{ bomForth.objectNumber }}</a>
+                                        </div>
+                                        <div class="secondary-text nested-row-inner" flex="10">
+                                            {{bomForth.revision}}
+                                        </div>
+                                        <div class="secondary-text nested-row-inner" flex="10">
+                                            {{ bomForth.objectName }}
+                                        </div>
+                                        <div class="secondary-text nested-row-inner" flex="10">
+                                            {{ bomForth.categoryName }}
+                                        </div>
+                                        <div class="secondary-text nested-row-inner" flex="10">
+                                            {{ bomForth.status }}
+                                        </div>
+                                        <div class="secondary-text nested-row-inner" flex="10">
+                                            {{ bomForth.quantity }}
+                                        </div>
+                                        <div class="secondary-text nested-row-inner" flex="40">
+                                            <table ng-if="vm.hasSourcingRecord(bomForth.sourcingList);" ng-init="fourthSourceList=vm.buildSourcingList(bomForth.sourcingList)" style="width: 100%" class="inner-table">
+                                                <tr ng-repeat="source in ::fourthSourceList | orderBy:['group'] | orderBy:['manufacturerName','name']:false">
+                                                    <td>{{source.manufacturerName }}</td>
+                                                    <td>{{source.manufacturerPartNumber }}</td>
+                                                    <td>{{source.name }}</td>
+                                                    <td>{{source.sourcingPartNumber }}</td>
+                                                </tr>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- / CONTENT -->
+    </div>
+</div>
+
+
+
+<tr md-row ng-if="(bomThird.fuseObjectBOMResponseList||[]).length>0"
+    ng-show="bomThird.rowCollapsed"
+    ng-repeat-end
+    ng-repeat="bomForth in bomThird.fuseObjectBOMResponseList">
+    <td md-cell >
+        <div layout="row">
+            <md-button class="edit-button md-icon-button"
+                       aria-label="Organization details">
+                <ng-md-icon icon="create" size="16"></ng-md-icon>
+            </md-button>
+            <md-button ng-if="bomForth.fuseObjectBOMResponseList.length > 0" class="edit-button md-icon-button" ng-click="bomForth.rowCollapsed=!bomForth.rowCollapsed;"
+                       aria-label="Organization details">
+                <ng-md-icon icon="{{bomForth.rowCollapsed?'remove': 'add'}}" size="16"></ng-md-icon>
+            </md-button>
+        </div>
+    </td>
+    <td md-cell>
+        <span>&nbsp;</span>
+        <span>&nbsp;</span>
+        <span>&nbsp;</span>
+        <span>&nbsp;</span>
+        <span>4.{{($index + 1)}}</span>
+    </td>
+    <td md-cell>
+        <a ui-sref="app.objects.products.details({id:bomForth.objectId})" ng-if="bomForth.objectType == 'products'">{{ bomForth.objectNumber }}</a>
+        <a ui-sref="app.objects.part.parts({id:bomForth.objectId})" ng-if="bomForth.objectType == 'parts'">{{ bomForth.objectNumber }}</a>
+    </td>
+    <td md-cell>{{bomForth.revision}}</td>
+    <td md-cell>{{bomForth.objectName}}</td>
+    <td md-cell>{{bomForth.categoryName}}</td>
+    <td md-cell>{{bomForth.status}}</td>
+    <td md-cell>{{bomForth.quantity}}</td>
+    <td md-cell class="zero-padding" colspan="4">
+        <md-table-container>
+            <table md-table  ng-if="hasSourcingRecord(bomForth.sourcingList);" ng-init="sourceList=buildSourcingList(bomForth.sourcingList)">
+                <tbody md-body>
+                <tr md-row ng-repeat="source in ::sourceList | orderBy:['group'] | orderBy:['manufacturerName','name']:false">
+                    <td md-cell class="manufacturer-name"><span ng-bind="source.manufacturerName"></span></td>
+                    <td md-cell class="manufacturer-part-number"><span ng-bind="source.manufacturerPartNumber"></span></td>
+                    <td md-cell class="supplier-name"><span ng-bind="source.name"></span></td>
+                    <td md-cell class="supplier-part-number"><span ng-bind="source.sourcingPartNumber"></span></td>
+                </tr>
+                </tbody>
+            </table>
+        </md-table-container>
+    </td>
+</tr>
