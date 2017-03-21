@@ -1,6 +1,8 @@
 <!-- exact table from live  -->
 
 <md-content>
+
+
     <md-table-container>
         <table md-table ng-model="selectedRow" md-progress="promise">
 
@@ -14,169 +16,145 @@
                 <th md-column md:order:by="categoryName"><span>Category</span></th>
                 <th md-column md:order:by="status"><span>Status</span></th>
                 <th md-column md:order:by="quantity"><span>Quantity</span></th>
-                <th md-column><span>Manufacturer  Name</span></th>
-                <th md-column><span>Manufacturer Part  Number</span></th>
-                <th md-column><span>Supplier Name</span></th>
-                <th md-column><span>Supplier Part Number</span></th>
+                <th md-column><span>Manufacturer<br/>Name</span></th>
+                <th md-column><span>Manufacturer<br/>Part  Number</span></th>
+                <th md-column><span>Supplier<br/>Name</span></th>
+                <th md-column><span>Supplier<br/>Part Number</span></th>
             </tr>
             </thead>
 
-            <tbody md-body>
+            <tbody md-body  ng-if="boms.length>0" ms-repeat="firstBom in boms | filter: filter.search | orderBy: query.order | limitTo: query.limit : (query.page - 1) * query.limit">
 
-                <tr ng-if="boms.length>0" md-row ng-repeat-start="firstBoms in boms | filter: filter.search | orderBy: query.order | limitTo: query.limit : (query.page - 1) * query.limit">
-                    <td md-cell>
-                        <div layout="row" ng-init="firstBoms.rowCollapsed=true;">
-                            <md-button class="edit-button md-icon-button"
-                                       aria-label="Organization details">
-                                <ng-md-icon icon="create" size="16"></ng-md-icon>
-                            </md-button>
-                            <md-button ng-if="firstBoms.fuseObjectBOMResponseList.length > 0" class="edit-button md-icon-button" ng-click="firstBoms.rowCollapsed=!firstBoms.rowCollapsed;"
-                                       aria-label="Organization details">
-                                <ng-md-icon icon="{{firstBoms.rowCollapsed?'add' : 'remove'}}" size="16"></ng-md-icon>
-                            </md-button>
-                        </div>
-                    </td>
-                    <td md-cell>{{((query.page-1) * query.limit)+($index + 1)}}</td>
-                    <td md-cell>
-                        <a ui-sref="app.objects.products.details({id:boms.objectId})" ng-if="firstBoms.objectType == 'products'">{{ firstBoms.objectNumber }}</a>
-                        <a ui-sref="app.objects.part.parts({id:boms.objectId})" ng-if="firstBoms.objectType == 'parts'">{{ firstBoms.objectNumber }}</a>
-                    </td>
-                    <td md-cell>{{firstBoms.revision}}</td>
-                    <td md-cell>{{firstBoms.objectName}}</td>
-                    <td md-cell>{{firstBoms.categoryName}}</td>
-                    <td md-cell>{{firstBoms.status}}</td>
-                    <td md-cell>{{firstBoms.quantity}}</td>
-                    <td md-cell colspan="4">
-                        <table md-table  ng-if="hasSourcingRecord(firstBoms.sourcingList);" ng-init="sourceList=buildSourcingList(firstBoms.sourcingList)">
+            <tr md-row  ng-init="firstBom.rowCollapsed=false;">
+                <td md-cell>
+                    <div layout="row">
+                        <md-button class="edit-button md-icon-button"
+                                   aria-label="Organization details">
+                            <ng-md-icon icon="create" size="16"></ng-md-icon>
+                        </md-button>
+                        <md-button ng-if="firstBom.fuseObjectBOMResponseList.length > 0" class="edit-button md-icon-button" ng-click="firstBom.rowCollapsed=!firstBom.rowCollapsed;"
+                                   aria-label="Organization details">
+                            <ng-md-icon icon="{{firstBom.rowCollapsed?'remove': 'add' }}" size="16"></ng-md-icon>
+                        </md-button>
+                    </div>
+                </td>
+                <td md-cell>{{((query.page-1) * query.limit)+($index + 1)}}</td>
+                <td md-cell>
+                    <a ui-sref="app.objects.products.details({id:boms.objectId})" ng-if="firstBom.objectType == 'products'">{{ firstBom.objectNumber }}</a>
+                    <a ui-sref="app.objects.part.parts({id:boms.objectId})" ng-if="firstBom.objectType == 'parts'">{{ firstBom.objectNumber }}</a>
+                </td>
+                <td md-cell>{{firstBom.revision}}</td>
+                <td md-cell>{{firstBom.objectName}}</td>
+                <td md-cell>{{firstBom.categoryName}}</td>
+                <td md-cell>{{firstBom.status}}</td>
+                <td md-cell>{{firstBom.quantity}}</td>
+                <td md-cell colspan="4" class="zero-padding">
+                    <md-table-container>
+                        <table md-table  ng-if="hasSourcingRecord(firstBom.sourcingList);" ng-init="sourceList=buildSourcingList(firstBom.sourcingList)">
                             <tbody md-body>
                             <tr md-row ng-repeat="source in ::sourceList | orderBy:['group'] | orderBy:['manufacturerName','name']:false">
-                                <td md-cell>{{source.manufacturerName }}</td>
-                                <td md-cell>{{source.manufacturerPartNumber }}</td>
-                                <td md-cell>{{source.name }}</td>
-                                <td md-cell>{{source.sourcingPartNumber }}</td>
+                                <td md-cell class="manufacturer-name"><span ng-bind="source.manufacturerName"></span></td>
+                                <td md-cell class="manufacturer-part-number"><span ng-bind="source.manufacturerPartNumber"></span></td>
+                                <td md-cell class="supplier-name"><span ng-bind="source.name"></span></td>
+                                <td md-cell class="supplier-part-number"><span ng-bind="source.sourcingPartNumber"></span></td>
                             </tr>
                             </tbody>
                         </table>
-                    </td>
-                </tr>
+                    </md-table-container>
+                </td>
+            </tr>
 
-                <tr md-row ng-if="!firstBoms.rowCollapsed" ng-repeat-end ng-repeat-start="bomsSecond in (firstBoms.fuseObjectBOMResponseList||[])">
+            <tr md-row ng-if="(firstBom.fuseObjectBOMResponseList||[]).length>0" ng-show="firstBom.rowCollapsed" ng-repeat-start="bomsSecond in firstBom.fuseObjectBOMResponseList">
 
-                    <td md-cell>
-                        <div layout="row" ng-init="bomsSecond.rowCollapsed=true;">
-                            <md-button class="edit-button md-icon-button"
-                                       aria-label="Organization details">
-                                <ng-md-icon icon="create" size="16"></ng-md-icon>
-                            </md-button>
-                            <md-button ng-if="bomsSecond.fuseObjectBOMResponseList.length > 0" class="edit-button md-icon-button" ng-click="bomsSecond.rowCollapsed=!bomsSecond.rowCollapsed;"
-                                       aria-label="Organization details">
-                                <ng-md-icon icon="{{bomsSecond.rowCollapsed?'add' : 'remove'}}" size="16"></ng-md-icon>
-                            </md-button>
-                        </div>
-                    </td>
-                    <td md-cell>{{($index + 1)}}{{bomsSecond.fuseObjectBOMResponseList.length}}</td>
-                    <td md-cell>
-                        <a ui-sref="app.objects.products.details({id:bomsSecond.objectId})" ng-if="bomsSecond.objectType == 'products'">{{ bomsSecond.objectNumber }}</a>
-                        <a ui-sref="app.objects.part.parts({id:bomsSecond.objectId})" ng-if="bomsSecond.objectType == 'parts'">{{ bomsSecond.objectNumber }}</a>
-                    </td>
-                    <td md-cell>{{bomsSecond.revision}}</td>
-                    <td md-cell>{{bomsSecond.objectName}}</td>
-                    <td md-cell>{{bomsSecond.categoryName}}</td>
-                    <td md-cell>{{bomsSecond.status}}</td>
-                    <td md-cell>{{bomsSecond.quantity}}</td>
-                    <td md-cell colspan="4">
+                <td md-cell ng-init="bomsSecond.rowCollapsed=false;">
+                    <div layout="row">
+                        <md-button class="edit-button md-icon-button"
+                                   aria-label="Organization details">
+                            <ng-md-icon icon="create" size="16"></ng-md-icon>
+                        </md-button>
+                        <md-button ng-if="bomsSecond.fuseObjectBOMResponseList.length > 0" class="edit-button md-icon-button" ng-click="bomsSecond.rowCollapsed=!bomsSecond.rowCollapsed;"
+                                   aria-label="Organization details">
+                            <ng-md-icon icon="{{bomsSecond.rowCollapsed?'remove': 'add' }}" size="16"></ng-md-icon>
+                        </md-button>
+                    </div>
+                </td>
+                <td md-cell>
+                    <span>&nbsp;</span>
+                    <span>&nbsp;</span>
+                    <span>2.{{($index + 1)}}</span>
+                </td>
+                <td md-cell>
+                    <a ui-sref="app.objects.products.details({id:bomsSecond.objectId})" ng-if="bomsSecond.objectType == 'products'">{{ bomsSecond.objectNumber }}</a>
+                    <a ui-sref="app.objects.part.parts({id:bomsSecond.objectId})" ng-if="bomsSecond.objectType == 'parts'">{{ bomsSecond.objectNumber }}</a>
+                </td>
+                <td md-cell>{{bomsSecond.revision}}</td>
+                <td md-cell>{{bomsSecond.objectName}}</td>
+                <td md-cell>{{bomsSecond.categoryName}}</td>
+                <td md-cell>{{bomsSecond.status}}</td>
+                <td md-cell>{{bomsSecond.quantity}}</td>
+                <td md-cell  class="zero-padding" colspan="4">
+                    <md-table-container>
                         <table md-table  ng-if="hasSourcingRecord(bomsSecond.sourcingList);" ng-init="sourceList=buildSourcingList(bomsSecond.sourcingList)">
                             <tbody md-body>
                             <tr md-row ng-repeat="source in ::sourceList | orderBy:['group'] | orderBy:['manufacturerName','name']:false">
-                                <td md-cell>{{source.manufacturerName }}</td>
-                                <td md-cell>{{source.manufacturerPartNumber }}</td>
-                                <td md-cell>{{source.name }}</td>
-                                <td md-cell>{{source.sourcingPartNumber }}</td>
+                                <td md-cell class="manufacturer-name"><span ng-bind="source.manufacturerName"></span></td>
+                                <td md-cell class="manufacturer-part-number"><span ng-bind="source.manufacturerPartNumber"></span></td>
+                                <td md-cell class="supplier-name"><span ng-bind="source.name"></span></td>
+                                <td md-cell class="supplier-part-number"><span ng-bind="source.sourcingPartNumber"></span></td>
                             </tr>
                             </tbody>
                         </table>
-                    </td>
+                    </md-table-container>
+                </td>
 
-                </tr>
+            </tr>
 
-                <tr md-row ng-if="!bomsSecond.rowCollapsed"
-                    ng-repeat-end ng-repeat-start="bomThird in (bomsSecond.fuseObjectBOMResponseList||[])">
-                    <td md-cell>
-                        <div layout="row" ng-init="bomThird.rowCollapsed=true;">
-                            <md-button class="edit-button md-icon-button" ng-click="showTabDialog($event, bomThird)"
-                                       aria-label="Organization details">
-                                <ng-md-icon icon="create" size="16"></ng-md-icon>
-                            </md-button>
-                            <md-button ng-if="bomThird.fuseObjectBOMResponseList.length > 0" class="edit-button md-icon-button" ng-click="bomThird.rowCollapsed=!bomThird.rowCollapsed;"
-                                       aria-label="Organization details">
-                                <ng-md-icon icon="{{bomThird.rowCollapsed?'add' : 'remove'}}" size="16"></ng-md-icon>
-                            </md-button>
-                        </div>
-                    </td>
-                    <td md-cell>{{($index + 1)}}</td>
-                    <td md-cell>
-                        <a ui-sref="app.objects.products.details({id:bomThird.objectId})" ng-if="bomThird.objectType == 'products'">{{ bomThird.objectNumber }}</a>
-                        <a ui-sref="app.objects.part.parts({id:bomThird.objectId})" ng-if="bomThird.objectType == 'parts'">{{ bomThird.objectNumber }}</a>
-                    </td>
-                    <td md-cell>{{bomThird.revision}}</td>
-                    <td md-cell>{{bomThird.objectName}}</td>
-                    <td md-cell>{{bomThird.categoryName}}</td>
-                    <td md-cell>{{bomThird.status}}</td>
-                    <td md-cell>{{bomThird.quantity}}</td>
-                    <td md-cell colspan="4">
+            <tr md-row ng-if="(bomsSecond.fuseObjectBOMResponseList||[]).length>0"
+                ng-show="bomsSecond.rowCollapsed" ng-repeat-end ms-repeat="bomThird in bomsSecond.fuseObjectBOMResponseList">
+                <td md-cell ng-init="bomThird.rowCollapsed=false;">
+                    <div layout="row">
+                        <md-button class="edit-button md-icon-button"
+                                   aria-label="Organization details">
+                            <ng-md-icon icon="create" size="16"></ng-md-icon>
+                        </md-button>
+                        <md-button ng-if="bomThird.fuseObjectBOMResponseList.length > 0" class="edit-button md-icon-button" ng-click="bomThird.rowCollapsed=!bomThird.rowCollapsed;"
+                                   aria-label="Organization details">
+                            <ng-md-icon icon="{{bomThird.rowCollapsed?'remove': 'add' }}" size="16"></ng-md-icon>
+                        </md-button>
+                    </div>
+                </td>
+                <td md-cell>
+                    <span>&nbsp;</span>
+                    <span>&nbsp;</span>
+                    <span>&nbsp;</span>
+                    <span>3.{{($index + 1)}}</span>
+                </td>
+                <td md-cell>
+                    <a ui-sref="app.objects.products.details({id:bomThird.objectId})" ng-if="bomThird.objectType == 'products'">{{ bomThird.objectNumber }}</a>
+                    <a ui-sref="app.objects.part.parts({id:bomThird.objectId})" ng-if="bomThird.objectType == 'parts'">{{ bomThird.objectNumber }}</a>
+                </td>
+                <td md-cell>{{bomThird.revision}}</td>
+                <td md-cell>{{bomThird.objectName}}</td>
+                <td md-cell>{{bomThird.categoryName}}</td>
+                <td md-cell>{{bomThird.status}}</td>
+                <td md-cell>{{bomThird.quantity}}</td>
+                <td md-cell class="zero-padding" colspan="4">
+                    <md-table-container>
                         <table md-table  ng-if="hasSourcingRecord(bomThird.sourcingList);" ng-init="sourceList=buildSourcingList(bomThird.sourcingList)">
                             <tbody md-body>
                             <tr md-row ng-repeat="source in ::sourceList | orderBy:['group'] | orderBy:['manufacturerName','name']:false">
-                                <td md-cell>{{source.manufacturerName }}</td>
-                                <td md-cell>{{source.manufacturerPartNumber }}</td>
-                                <td md-cell>{{source.name }}</td>
-                                <td md-cell>{{source.sourcingPartNumber }}</td>
+                                <td md-cell class="manufacturer-name"><span ng-bind="source.manufacturerName"></span></td>
+                                <td md-cell class="manufacturer-part-number"><span ng-bind="source.manufacturerPartNumber"></span></td>
+                                <td md-cell class="supplier-name"><span ng-bind="source.name"></span></td>
+                                <td md-cell class="supplier-part-number"><span ng-bind="source.sourcingPartNumber"></span></td>
                             </tr>
                             </tbody>
                         </table>
-                    </td>
-                </tr>
+                    </md-table-container>
+                </td>
+            </tr>
 
-                <tr md-row ng-if="!bomThird.rowCollapsed && (bomThird.fuseObjectBOMResponseList||[]).length > 0 " ng-repeat-end ng-repeat="bomForth in (bomThird.fuseObjectBOMResponseList||[])">
-                    <td md-cell>
-                        <div layout="row" ng-init="bomForth.rowCollapsed=true;">
-                            <md-button class="edit-button md-icon-button" ng-click="showTabDialog($event, bomForth)"
-                                       aria-label="Organization details" ng-disabled="readonly;SaveDisabled">
-                                <ng-md-icon icon="create" size="16"></ng-md-icon>
-                            </md-button>
-                            <md-button ng-if="bomForth.fuseObjectBOMResponseList.length > 0" class="edit-button md-icon-button" ng-click="bomForth.rowCollapsed=!bomForth.rowCollapsed;"
-                                       aria-label="Organization details">
-                                <ng-md-icon icon="{{bomForth.rowCollapsed?'add' : 'remove'}}" size="16"></ng-md-icon>
-                            </md-button>
-                        </div>
-                    </td>
-                    <td md-cell>{{($index + 1)}}</td>
-                    <td md-cell>
-                        <a ui-sref="app.objects.products.details({id:bomForth.objectId})" ng-if="bomForth.objectType == 'products'">{{ bomForth.objectNumber }}</a>
-                        <a ui-sref="app.objects.part.parts({id:bomForth.objectId})" ng-if="bomForth.objectType == 'parts'">{{ bomForth.objectNumber }}</a>
-                    </td>
-                    <td md-cell>{{bomForth.revision}}</td>
-                    <td md-cell>{{bomForth.objectName}}</td>
-                    <td md-cell>{{bomForth.categoryName}}</td>
-                    <td md-cell>{{bomForth.status}}</td>
-                    <td md-cell>{{bomForth.quantity}}</td>
-                    <td md-cell colspan="4">
-                        <table md-table  ng-if="hasSourcingRecord(bomForth.sourcingList);" ng-init="sourceList=buildSourcingList(bomForth.sourcingList)">
-                            <tbody md-body>
-                            <tr md-row ng-repeat="source in ::sourceList | orderBy:['group'] | orderBy:['manufacturerName','name']:false">
-                                <td md-cell>{{source.manufacturerName }}</td>
-                                <td md-cell>{{source.manufacturerPartNumber }}</td>
-                                <td md-cell>{{source.name }}</td>
-                                <td md-cell>{{source.sourcingPartNumber }}</td>
-                            </tr>
-                            </tbody>
-                        </table>
-                    </td>
-                </tr>
 
-                <tr md-row ng-if="!(boms.length>0)">
-                    <td md-cell colspan="12">No record available</td>
-                </tr>
 
             </tbody>
         </table>
@@ -191,6 +169,7 @@
                               md-boundary-links="options.boundaryLinks">
 
     </data-md-table-pagination>
+
 
 
 </md-content>

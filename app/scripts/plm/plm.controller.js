@@ -1,6 +1,20 @@
 angular.module('nutritionApp')
     .controller('plmController', plmController);
 
+// var initInjector = angular.injector(['ng']);
+// var $provide = initInjector.get('$compile');
+// debugger;
+//
+// angular.module('ng')
+//     .provide(ngModule);
+//
+// function ngModule($provide) {
+//     $provide.provider('$compile', $CompileProvider).
+//     directive({
+//         msRepeat: msRepeatDirective
+//     });
+// }
+
 
 function plmController($http, $mdEditDialog, $q, $timeout, $scope){
     'use strict';
@@ -50,6 +64,11 @@ function plmController($http, $mdEditDialog, $q, $timeout, $scope){
     $scope.firsTableLimitOptions = angular.copy($scope.limitOptions);
 
     $scope.firsTableOptions = angular.copy($scope.options);
+
+
+    $scope.test = function(x){
+        console.log(angular.toJson(x));
+    }
 
 
     $scope.getListFromBomResponse = function( d ){debugger;
